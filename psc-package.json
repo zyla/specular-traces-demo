@@ -1,0 +1,32 @@
+{
+  "name": "demo",
+  "set": "psc-0.13.0-20190531",
+  "source": "https://github.com/purescript/package-sets.git",
+  "depends": [
+    "console",
+    "effect",
+    "prelude",
+    "specular",
+    "group"
+  ],
+  "extraDeps": {
+    "specular": {
+      "dependencies": [
+        "aff",
+        "debug",
+        "effect",
+        "foreign-object",
+        "generics-rep",
+        "maybe",
+        "prelude",
+        "random",
+        "record",
+        "transformers",
+        "unsafe-coerce",
+        "unsafe-reference"
+      ],
+      "repo": "../purescript-specular",
+      "version": "LATEST"
+    }
+  }
+}

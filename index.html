@@ -1,0 +1,84 @@
+<html>
+<head>
+<meta charset="utf-8">
+</head>
+<body>
+
+<script>
+
+(function() {
+const frameNameToIndex = {};
+const frames = [];
+let events = [];
+
+function prepareProfile() {
+  return {
+    shared: {
+      frames: frames
+    },
+    profiles: [
+      {
+        type: 'evented',
+        name: 'page',
+        unit: 'none',
+        startValue: events.length !== 0 ? events[0].at : 0,
+        endValue: events.length !== 0 ? events[events.length - 1].at : 0,
+        events: events
+      }
+    ]
+  };
+}
+
+var time = 0;
+
+window.Profile = {
+  begin: (name) => {
+    let frameIndex = frameNameToIndex[name];
+    if(frameIndex === undefined) {
+      frameIndex = frames.length;
+      frameNameToIndex[name] = frameIndex;
+      frames.push({ name: name });
+    }
+    events.push({type:'O', frame: frameIndex, at: time++})
+    return frameIndex;
+  },
+
+  end: (frame) => {
+    events.push({type:'C', frame: frame, at: time++})
+  },
+
+  measure: (name, block) => {
+    const span = Profile.begin(name);
+    const result = block();
+    Profile.end(span);
+    return result;
+  },
+
+  open: () => {
+    const w = window.open('http://localhost:1234');
+    setTimeout(() => {
+      console.log('sending message to Speedscope');
+      w.postMessage({type: 'loadInitialProfile', profile: prepareProfile()}, '*');
+    }, 100);
+  },
+
+  reset: () => {
+    events = [];
+  },
+
+  prepareProfile: prepareProfile
+};
+
+window._Specular_profiling = {
+  begin: Profile.begin,
+  end: Profile.end,
+};
+})();
+</script>
+
+<script src="output/bundle.js"></script>
+
+<button onclick="Profile.open()">Show profile</button>
+
+</body>
+</html>
